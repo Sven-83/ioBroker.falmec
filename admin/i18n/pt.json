@@ -1,0 +1,11 @@
+{
+    "Connection": "Conexão",
+    "broadlink2 instance": "Instância broadlink2",
+    "Device name": "Nome do dispositivo",
+    "device_name_help": "Nome do dispositivo emissor no broadlink2, começa por RM:",
+    "Base pattern": "Padrão base",
+    "base_pattern_help": "Sinal fixo de 16 bits do exaustor, com todos os bits de nível e de luz a 0",
+    "base_pattern_error": "Introduza exatamente 16 bits (0 ou 1)",
+    "Timer": "Temporizador",
+    "Switch the light off when the timer expires": "Desligar a luz quando o temporizador terminar"
+}

@@ -1,0 +1,11 @@
+{
+    "Connection": "Connessione",
+    "broadlink2 instance": "Istanza broadlink2",
+    "Device name": "Nome del dispositivo",
+    "device_name_help": "Nome del dispositivo trasmittente in broadlink2, inizia con RM:",
+    "Base pattern": "Schema di base",
+    "base_pattern_help": "Segnale fisso a 16 bit della cappa, con tutti i bit di velocità e luce a 0",
+    "base_pattern_error": "Inserire esattamente 16 bit (0 o 1)",
+    "Timer": "Timer",
+    "Switch the light off when the timer expires": "Spegnere la luce allo scadere del timer"
+}

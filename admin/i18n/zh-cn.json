@@ -1,0 +1,11 @@
+{
+    "Connection": "连接",
+    "broadlink2 instance": "broadlink2 实例",
+    "Device name": "设备名称",
+    "device_name_help": "broadlink2 中发送设备的名称,以 RM: 开头",
+    "Base pattern": "基础模式",
+    "base_pattern_help": "抽油烟机的固定 16 位信号,所有档位和灯光位均为 0",
+    "base_pattern_error": "请输入正好 16 位(0 或 1)",
+    "Timer": "定时器",
+    "Switch the light off when the timer expires": "定时器结束时关闭灯光"
+}

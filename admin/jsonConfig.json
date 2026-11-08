@@ -1,0 +1,73 @@
+{
+    "i18n": true,
+    "type": "panel",
+    "items": {
+        "broadlinkHeader": {
+            "type": "header",
+            "text": "Connection",
+            "size": 3,
+            "xs": 12,
+            "sm": 12,
+            "md": 12,
+            "lg": 12,
+            "xl": 12
+        },
+        "broadlinkInstance": {
+            "type": "instance",
+            "adapter": "broadlink2",
+            "label": "broadlink2 instance",
+            "newLine": true,
+            "xs": 12,
+            "sm": 12,
+            "md": 6,
+            "lg": 4,
+            "xl": 4
+        },
+        "deviceName": {
+            "type": "text",
+            "label": "Device name",
+            "help": "device_name_help",
+            "newLine": true,
+            "xs": 12,
+            "sm": 12,
+            "md": 6,
+            "lg": 4,
+            "xl": 4
+        },
+        "basePattern": {
+            "type": "text",
+            "label": "Base pattern",
+            "help": "base_pattern_help",
+            "validator": "!data.basePattern || /^[01]{16}$/.test(data.basePattern.replace(/\\s/g, ''))",
+            "validatorErrorText": "base_pattern_error",
+            "validatorNoSaveOnError": true,
+            "newLine": true,
+            "xs": 12,
+            "sm": 12,
+            "md": 6,
+            "lg": 4,
+            "xl": 4
+        },
+        "timerHeader": {
+            "type": "header",
+            "text": "Timer",
+            "size": 3,
+            "newLine": true,
+            "xs": 12,
+            "sm": 12,
+            "md": 12,
+            "lg": 12,
+            "xl": 12
+        },
+        "timerLightOff": {
+            "type": "checkbox",
+            "label": "Switch the light off when the timer expires",
+            "newLine": true,
+            "xs": 12,
+            "sm": 12,
+            "md": 12,
+            "lg": 12,
+            "xl": 12
+        }
+    }
+}

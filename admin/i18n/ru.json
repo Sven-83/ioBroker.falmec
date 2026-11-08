@@ -1,0 +1,11 @@
+{
+    "Connection": "Подключение",
+    "broadlink2 instance": "Экземпляр broadlink2",
+    "Device name": "Имя устройства",
+    "device_name_help": "Имя передающего устройства в broadlink2, начинается с RM:",
+    "Base pattern": "Базовый шаблон",
+    "base_pattern_help": "Постоянный 16-битный сигнал вытяжки, все биты скорости и света равны 0",
+    "base_pattern_error": "Введите ровно 16 бит (0 или 1)",
+    "Timer": "Таймер",
+    "Switch the light off when the timer expires": "Выключать свет по истечении таймера"
+}

@@ -1,0 +1,279 @@
+{
+    "common": {
+        "name": "falmec",
+        "version": "0.0.1",
+        "news": {
+            "0.0.1": {
+                "en": "initial release",
+                "de": "Erstveröffentlichung",
+                "ru": "Начальная версия",
+                "pt": "lançamento inicial",
+                "nl": "Eerste uitgave",
+                "fr": "Première version",
+                "it": "Versione iniziale",
+                "es": "Versión inicial",
+                "pl": "Pierwsze wydanie",
+                "uk": "Початкова версія",
+                "zh-cn": "首次出版"
+            }
+        },
+        "titleLang": {
+            "en": "Falmec hood",
+            "de": "Falmec-Dunstabzug",
+            "ru": "Вытяжка Falmec",
+            "pt": "Exaustor Falmec",
+            "nl": "Falmec-afzuigkap",
+            "fr": "Hotte Falmec",
+            "it": "Cappa Falmec",
+            "es": "Campana Falmec",
+            "pl": "Okap Falmec",
+            "uk": "Витяжка Falmec",
+            "zh-cn": "Falmec 抽油烟机"
+        },
+        "desc": {
+            "en": "Controls a Falmec Vega ceiling hood (434 MHz) through a BroadLink RM4 Pro and the broadlink2 adapter",
+            "de": "Steuert eine Falmec-Vega-Deckenhaube (434 MHz) über einen BroadLink RM4 Pro und den Adapter broadlink2",
+            "ru": "Управляет потолочной вытяжкой Falmec Vega (434 МГц) через BroadLink RM4 Pro и адаптер broadlink2",
+            "pt": "Controla um exaustor de teto Falmec Vega (434 MHz) através de um BroadLink RM4 Pro e do adaptador broadlink2",
+            "nl": "Bedient een Falmec Vega-plafondafzuigkap (434 MHz) via een BroadLink RM4 Pro en de broadlink2-adapter",
+            "fr": "Commande une hotte de plafond Falmec Vega (434 MHz) via un BroadLink RM4 Pro et l'adaptateur broadlink2",
+            "it": "Controlla una cappa a soffitto Falmec Vega (434 MHz) tramite un BroadLink RM4 Pro e l'adattatore broadlink2",
+            "es": "Controla una campana de techo Falmec Vega (434 MHz) mediante un BroadLink RM4 Pro y el adaptador broadlink2",
+            "pl": "Steruje okapem sufitowym Falmec Vega (434 MHz) przez BroadLink RM4 Pro i adapter broadlink2",
+            "uk": "Керує стельовою витяжкою Falmec Vega (434 МГц) через BroadLink RM4 Pro та адаптер broadlink2",
+            "zh-cn": "通过 BroadLink RM4 Pro 和 broadlink2 适配器控制 Falmec Vega 吸顶式抽油烟机(434 MHz)"
+        },
+        "authors": ["Sven-83 <276080681+Sven-83@users.noreply.github.com>"],
+        "keywords": ["falmec", "hood", "broadlink", "rf", "434mhz"],
+        "licenseInformation": {
+            "type": "free",
+            "license": "MIT"
+        },
+        "platform": "Javascript/Node.js",
+        "icon": "falmec.png",
+        "enabled": true,
+        "extIcon": "https://raw.githubusercontent.com/Sven-83/ioBroker.falmec/main/admin/falmec.png",
+        "readme": "https://github.com/Sven-83/ioBroker.falmec/blob/main/README.md",
+        "loglevel": "info",
+        "tier": 3,
+        "mode": "daemon",
+        "type": "household",
+        "compact": true,
+        "connectionType": "local",
+        "dataSource": "assumption",
+        "adminUI": {
+            "config": "json"
+        },
+        "dependencies": [
+            {
+                "js-controller": ">=6.0.11"
+            }
+        ],
+        "globalDependencies": [
+            {
+                "admin": ">=7.6.20"
+            },
+            {
+                "broadlink2": ">=2.3.0"
+            }
+        ]
+    },
+    "native": {
+        "broadlinkInstance": "broadlink2.0",
+        "deviceName": "",
+        "basePattern": "",
+        "timerLightOff": false
+    },
+    "objects": [],
+    "instanceObjects": [
+        {
+            "_id": "info",
+            "type": "channel",
+            "common": {
+                "name": "Information"
+            },
+            "native": {}
+        },
+        {
+            "_id": "info.connection",
+            "type": "state",
+            "common": {
+                "role": "indicator.connected",
+                "name": "BroadLink device reachable",
+                "type": "boolean",
+                "read": true,
+                "write": false,
+                "def": false
+            },
+            "native": {}
+        },
+        {
+            "_id": "light",
+            "type": "channel",
+            "common": {
+                "name": "Light"
+            },
+            "native": {}
+        },
+        {
+            "_id": "light.on",
+            "type": "state",
+            "common": {
+                "role": "switch.light",
+                "name": "Light on (assumed, the hood sends no feedback)",
+                "type": "boolean",
+                "read": true,
+                "write": true,
+                "def": false
+            },
+            "native": {}
+        },
+        {
+            "_id": "light.toggle",
+            "type": "state",
+            "common": {
+                "role": "button",
+                "name": "Toggle light",
+                "type": "boolean",
+                "read": false,
+                "write": true
+            },
+            "native": {}
+        },
+        {
+            "_id": "fan",
+            "type": "channel",
+            "common": {
+                "name": "Fan"
+            },
+            "native": {}
+        },
+        {
+            "_id": "fan.level",
+            "type": "state",
+            "common": {
+                "role": "level",
+                "name": "Fan level, 0 = off (assumed, the hood sends no feedback)",
+                "type": "number",
+                "min": 0,
+                "max": 4,
+                "read": true,
+                "write": true,
+                "def": 0
+            },
+            "native": {}
+        },
+        {
+            "_id": "fan.up",
+            "type": "state",
+            "common": {
+                "role": "button",
+                "name": "Fan one level up",
+                "type": "boolean",
+                "read": false,
+                "write": true
+            },
+            "native": {}
+        },
+        {
+            "_id": "fan.down",
+            "type": "state",
+            "common": {
+                "role": "button",
+                "name": "Fan one level down",
+                "type": "boolean",
+                "read": false,
+                "write": true
+            },
+            "native": {}
+        },
+        {
+            "_id": "timer",
+            "type": "channel",
+            "common": {
+                "name": "Timer"
+            },
+            "native": {}
+        },
+        {
+            "_id": "timer.minutes",
+            "type": "state",
+            "common": {
+                "role": "level.timer",
+                "name": "Timer duration",
+                "type": "number",
+                "unit": "min",
+                "min": 1,
+                "max": 240,
+                "read": true,
+                "write": true,
+                "def": 15
+            },
+            "native": {}
+        },
+        {
+            "_id": "timer.start",
+            "type": "state",
+            "common": {
+                "role": "button",
+                "name": "Start timer",
+                "type": "boolean",
+                "read": false,
+                "write": true
+            },
+            "native": {}
+        },
+        {
+            "_id": "timer.stop",
+            "type": "state",
+            "common": {
+                "role": "button",
+                "name": "Stop timer without changing the fan",
+                "type": "boolean",
+                "read": false,
+                "write": true
+            },
+            "native": {}
+        },
+        {
+            "_id": "timer.active",
+            "type": "state",
+            "common": {
+                "role": "indicator",
+                "name": "Timer running",
+                "type": "boolean",
+                "read": true,
+                "write": false,
+                "def": false
+            },
+            "native": {}
+        },
+        {
+            "_id": "timer.remaining",
+            "type": "state",
+            "common": {
+                "role": "value",
+                "name": "Remaining time",
+                "type": "number",
+                "unit": "min",
+                "read": true,
+                "write": false,
+                "def": 0
+            },
+            "native": {}
+        },
+        {
+            "_id": "timer.end",
+            "type": "state",
+            "common": {
+                "role": "date",
+                "name": "Timer end time, 0 = no timer",
+                "type": "number",
+                "read": true,
+                "write": false,
+                "def": 0
+            },
+            "native": {}
+        }
+    ]
+}

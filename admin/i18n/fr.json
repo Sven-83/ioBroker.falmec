@@ -1,0 +1,11 @@
+{
+    "Connection": "Connexion",
+    "broadlink2 instance": "Instance broadlink2",
+    "Device name": "Nom de l'appareil",
+    "device_name_help": "Nom de l'appareil émetteur dans broadlink2, commence par RM:",
+    "Base pattern": "Motif de base",
+    "base_pattern_help": "Signal fixe de 16 bits de la hotte, avec tous les bits de vitesse et de lumière à 0",
+    "base_pattern_error": "Veuillez saisir exactement 16 bits (0 ou 1)",
+    "Timer": "Minuterie",
+    "Switch the light off when the timer expires": "Éteindre la lumière à la fin de la minuterie"
+}

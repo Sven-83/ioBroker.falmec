@@ -1,0 +1,11 @@
+{
+    "Connection": "Połączenie",
+    "broadlink2 instance": "Instancja broadlink2",
+    "Device name": "Nazwa urządzenia",
+    "device_name_help": "Nazwa urządzenia nadawczego w broadlink2, zaczyna się od RM:",
+    "Base pattern": "Wzorzec bazowy",
+    "base_pattern_help": "Stały 16-bitowy sygnał okapu, wszystkie bity biegu i światła ustawione na 0",
+    "base_pattern_error": "Wprowadź dokładnie 16 bitów (0 lub 1)",
+    "Timer": "Minutnik",
+    "Switch the light off when the timer expires": "Wyłącz światło po upływie czasu minutnika"
+}

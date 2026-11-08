@@ -1,0 +1,11 @@
+{
+    "Connection": "Verbinding",
+    "broadlink2 instance": "broadlink2-instantie",
+    "Device name": "Apparaatnaam",
+    "device_name_help": "Naam van het zendende apparaat in broadlink2, begint met RM:",
+    "Base pattern": "Basispatroon",
+    "base_pattern_help": "Vast 16-bits signaal van de kap, met alle stand- en lichtbits op 0",
+    "base_pattern_error": "Voer precies 16 bits in (0 of 1)",
+    "Timer": "Timer",
+    "Switch the light off when the timer expires": "Licht uitschakelen wanneer de timer afloopt"
+}

@@ -1,0 +1,11 @@
+{
+    "Connection": "Connection",
+    "broadlink2 instance": "broadlink2 instance",
+    "Device name": "Device name",
+    "device_name_help": "Name of the sending device in broadlink2, starts with RM:",
+    "Base pattern": "Base pattern",
+    "base_pattern_help": "Fixed 16-bit signal of your hood with all level and light bits set to 0",
+    "base_pattern_error": "Please enter exactly 16 bits (0 or 1)",
+    "Timer": "Timer",
+    "Switch the light off when the timer expires": "Switch the light off when the timer expires"
+}
