@@ -22,7 +22,9 @@ Dieses Projekt ist privat und steht in keiner Verbindung zu Falmec oder BroadLin
 | `fan.up` / `fan.down` | Eine Stufe hoch/runter |
 | `timer.minutes` | Timer-Dauer, 1–240 Minuten |
 | `timer.start` / `timer.stop` | Timer starten/abbrechen; Abbrechen ändert den Lüfter nicht |
-| `timer.active` / `timer.remaining` / `timer.end` | Timer läuft, Restzeit in Minuten, Endzeit |
+| `timer.active` / `timer.remaining` / `timer.end` / `timer.total` | Timer läuft, Restzeit in Minuten, Endzeit, Gesamtdauer in Minuten |
+| `preset.level` / `preset.light` / `preset.timer` | Voreinstellung: Stufe, Licht, Timer in Minuten (0 = ohne). „Alles aus“ ist nicht möglich; soll die Stufe auf 0, zuerst das Licht einschalten. Ein Timer gilt nur bei laufendem Lüfter |
+| `preset.toggle` | Ist alles aus, startet die Voreinstellung; sonst geht alles aus und ein laufender Timer endet. Ein zweiter Druck innerhalb von 1 s wird ignoriert |
 | `info.connection` | broadlink2 läuft und das Gerät ist erreichbar |
 
 ### Einschränkungen
@@ -56,7 +58,9 @@ This is a private project and is not affiliated with Falmec or BroadLink.
 | `fan.up` / `fan.down` | One level up/down |
 | `timer.minutes` | Timer duration, 1–240 minutes |
 | `timer.start` / `timer.stop` | Start/cancel the timer; cancelling leaves the fan unchanged |
-| `timer.active` / `timer.remaining` / `timer.end` | Timer running, remaining minutes, end time |
+| `timer.active` / `timer.remaining` / `timer.end` / `timer.total` | Timer running, remaining minutes, end time, full duration in minutes |
+| `preset.level` / `preset.light` / `preset.timer` | Preset: level, light, timer in minutes (0 = none). "Everything off" is not possible; to set the level to 0, switch the light on first. A timer only applies while the fan runs |
+| `preset.toggle` | Starts the preset if everything is off; otherwise switches everything off and ends a running timer. A second press within 1 s is ignored |
 | `info.connection` | broadlink2 is running and the device is reachable |
 
 ### Limitations

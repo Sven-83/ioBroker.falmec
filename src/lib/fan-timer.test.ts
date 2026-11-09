@@ -48,7 +48,29 @@ describe('FanTimer', () => {
 
     it('stores the end time and shows the remaining minutes at start', () => {
         timer.start(10);
-        expect(last()).to.deep.equal({ active: true, endTime: clock.time + 10 * MINUTE, remainingMinutes: 10 });
+        expect(last()).to.deep.equal({
+            active: true,
+            endTime: clock.time + 10 * MINUTE,
+            remainingMinutes: 10,
+            totalMinutes: 10,
+        });
+    });
+
+    it('keeps the full duration while counting down', async () => {
+        timer.start(10);
+        await clock.advance(4 * MINUTE);
+        expect(last().totalMinutes).to.equal(10);
+    });
+
+    it('keeps the stored full duration after a resume', () => {
+        timer.resume(clock.time + 3 * MINUTE, 10);
+        expect(last().totalMinutes).to.equal(10);
+        expect(last().remainingMinutes).to.equal(3);
+    });
+
+    it('shows no full duration below the remaining time after a resume without a stored one', () => {
+        timer.resume(clock.time + 3 * MINUTE, 0);
+        expect(last().totalMinutes).to.equal(3);
     });
 
     it('counts down', async () => {
@@ -67,7 +89,7 @@ describe('FanTimer', () => {
         timer.start(10);
         await clock.advance(10 * MINUTE);
         expect(expiries).to.equal(1);
-        expect(last()).to.deep.equal({ active: false, endTime: 0, remainingMinutes: 0 });
+        expect(last()).to.deep.equal({ active: false, endTime: 0, remainingMinutes: 0, totalMinutes: 0 });
     });
 
     it('stop ends the timer without switching the fan', async () => {
@@ -88,14 +110,14 @@ describe('FanTimer', () => {
     });
 
     it('resume continues with the remaining time', async () => {
-        timer.resume(clock.time + 3 * MINUTE);
+        timer.resume(clock.time + 3 * MINUTE, 3);
         expect(last().remainingMinutes).to.equal(3);
         await clock.advance(3 * MINUTE);
         expect(expiries).to.equal(1);
     });
 
     it('resume with a past end time expires immediately', async () => {
-        timer.resume(clock.time - MINUTE);
+        timer.resume(clock.time - MINUTE, 3);
         await clock.advance(0);
         expect(expiries).to.equal(1);
         expect(last().active).to.equal(false);

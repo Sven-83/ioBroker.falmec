@@ -6,6 +6,8 @@ export interface TimerSnapshot {
     endTime: number;
     /** Remaining minutes, rounded up */
     remainingMinutes: number;
+    /** Full duration in minutes, 0 = no timer */
+    totalMinutes: number;
 }
 
 /** Environment of the timer logic. */
@@ -52,6 +54,7 @@ export function isValidMinutes(minutes: unknown): minutes is number {
  */
 export class FanTimer {
     private endTime = 0;
+    private totalMinutes = 0;
     private expiryHandle: unknown;
     private tickHandle: unknown;
     private generation = 0;
@@ -76,17 +79,19 @@ export class FanTimer {
      * @param minutes Duration in minutes
      */
     public start(minutes: number): void {
-        this.resume(this.deps.now() + minutes * MINUTE_MS);
+        this.resume(this.deps.now() + minutes * MINUTE_MS, minutes);
     }
 
     /**
      * Continues with a stored end time. An end time in the past expires immediately.
      *
      * @param endTime End time in milliseconds
+     * @param totalMinutes Full duration in minutes; never shown as less than the remaining time
      */
-    public resume(endTime: number): void {
+    public resume(endTime: number, totalMinutes: number): void {
         this.clearHandles();
         this.endTime = endTime;
+        this.totalMinutes = Math.max(totalMinutes, this.remainingMinutes());
         this.publish();
         const generation = this.generation;
         this.expiryHandle = this.deps.schedule(
@@ -105,6 +110,7 @@ export class FanTimer {
         }
         this.clearHandles();
         this.endTime = 0;
+        this.totalMinutes = 0;
         this.publish();
     }
 
@@ -162,12 +168,17 @@ export class FanTimer {
         }
     }
 
-    private publish(): void {
+    private remainingMinutes(): number {
         const remaining = this.endTime > 0 ? Math.max(0, this.endTime - this.deps.now()) : 0;
+        return Math.ceil(remaining / MINUTE_MS);
+    }
+
+    private publish(): void {
         this.deps.publish({
             active: this.active,
             endTime: this.endTime,
-            remainingMinutes: Math.ceil(remaining / MINUTE_MS),
+            remainingMinutes: this.remainingMinutes(),
+            totalMinutes: this.totalMinutes,
         });
     }
 }

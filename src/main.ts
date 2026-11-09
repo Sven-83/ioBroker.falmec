@@ -6,6 +6,7 @@ import * as utils from '@iobroker/adapter-core';
 import { FanTimer, isValidMinutes, MAX_MINUTES, MIN_MINUTES, type TimerSnapshot } from './lib/fan-timer';
 import { normalizePattern, validateConfig } from './lib/config';
 import { Hood, type HoodChange, type HoodState } from './lib/hood';
+import { DEFAULT_PRESET, isValidPreset, type Preset, PresetToggle } from './lib/preset';
 import { buildCode, encodeFrame, isSendSuccess, isValidLevel, MAX_LEVEL } from './lib/signal';
 
 const SEND_TIMEOUT_MS = 5000;
@@ -20,6 +21,8 @@ class Falmec extends utils.Adapter {
     private brokerAlive = false;
     private deviceReachable = false;
     private timerMinutes = DEFAULT_MINUTES;
+    private preset: Preset = { ...DEFAULT_PRESET };
+    private toggle: PresetToggle | undefined;
 
     /**
      * @param options Options passed by the adapter runtime
@@ -64,10 +67,20 @@ class Falmec extends utils.Adapter {
             now,
         });
         await this.readTimerMinutes();
+        await this.readPreset();
+        const { hood, timer } = this;
+        this.toggle = new PresetToggle({
+            target: () => hood.target,
+            apply: change => hood.apply(change),
+            startTimer: minutes => timer.start(minutes),
+            preset: () => this.preset,
+            now,
+        });
 
         await this.subscribeStatesAsync('light.*');
         await this.subscribeStatesAsync('fan.*');
         await this.subscribeStatesAsync('timer.*');
+        await this.subscribeStatesAsync('preset.*');
         if (this.configValid) {
             await this.watchConnection();
         }
@@ -75,7 +88,8 @@ class Falmec extends utils.Adapter {
         // A timer that ended during a restart expires right away; nothing else is sent at start.
         const end = await this.getStateAsync('timer.end');
         if (typeof end?.val === 'number' && end.val > 0) {
-            this.timer.resume(end.val);
+            const total = await this.getStateAsync('timer.total');
+            this.timer.resume(end.val, typeof total?.val === 'number' ? total.val : 0);
         }
     }
 
@@ -96,6 +110,29 @@ class Falmec extends utils.Adapter {
             this.timerMinutes = minutes.val;
         }
         await this.setState('timer.minutes', this.timerMinutes, true);
+    }
+
+    private async readPreset(): Promise<void> {
+        const stored = {
+            level: (await this.getStateAsync('preset.level'))?.val,
+            light: (await this.getStateAsync('preset.light'))?.val,
+            timer: (await this.getStateAsync('preset.timer'))?.val,
+        };
+        this.preset = isValidPreset(stored) ? stored : { ...DEFAULT_PRESET };
+        await this.setState('preset.level', this.preset.level, true);
+        await this.setState('preset.light', this.preset.light, true);
+        await this.setState('preset.timer', this.preset.timer, true);
+    }
+
+    private async updatePreset(id: string, key: keyof Preset, value: unknown): Promise<void> {
+        const next = { ...this.preset, [key]: value };
+        if (!isValidPreset(next)) {
+            this.log.warn(`${id} cannot be ${String(value)}: invalid value or the preset would leave everything off`);
+            await this.setState(id, this.preset[key], true);
+            return;
+        }
+        this.preset = next;
+        await this.setState(id, next[key], true);
     }
 
     private async publishHoodState(state: HoodState): Promise<void> {
@@ -158,6 +195,7 @@ class Falmec extends utils.Adapter {
 
     private async publishTimer(snapshot: TimerSnapshot): Promise<void> {
         try {
+            await this.setState('timer.total', snapshot.totalMinutes, true);
             await this.setState('timer.active', snapshot.active, true);
             await this.setState('timer.end', snapshot.endTime, true);
             await this.setState('timer.remaining', snapshot.remainingMinutes, true);
@@ -237,6 +275,20 @@ class Falmec extends utils.Adapter {
             case 'timer.stop':
                 if (state.val) {
                     timer.stop();
+                    await this.setState(id, true, true);
+                }
+                return;
+            case 'preset.level':
+                await this.updatePreset(id, 'level', state.val);
+                return;
+            case 'preset.light':
+                await this.updatePreset(id, 'light', state.val);
+                return;
+            case 'preset.timer':
+                await this.updatePreset(id, 'timer', state.val);
+                return;
+            case 'preset.toggle':
+                if (state.val && (await this.toggle?.tap())) {
                     await this.setState(id, true, true);
                 }
                 return;

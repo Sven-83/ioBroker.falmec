@@ -274,6 +274,84 @@
                 "def": 0
             },
             "native": {}
+        },
+        {
+            "_id": "timer.total",
+            "type": "state",
+            "common": {
+                "role": "value",
+                "name": "Full duration of the running timer, 0 = no timer",
+                "type": "number",
+                "unit": "min",
+                "read": true,
+                "write": false,
+                "def": 0
+            },
+            "native": {}
+        },
+        {
+            "_id": "preset",
+            "type": "channel",
+            "common": {
+                "name": "Preset"
+            },
+            "native": {}
+        },
+        {
+            "_id": "preset.level",
+            "type": "state",
+            "common": {
+                "role": "level",
+                "name": "Preset fan level, 0 = off",
+                "type": "number",
+                "min": 0,
+                "max": 4,
+                "read": true,
+                "write": true,
+                "def": 1
+            },
+            "native": {}
+        },
+        {
+            "_id": "preset.light",
+            "type": "state",
+            "common": {
+                "role": "switch",
+                "name": "Preset light",
+                "type": "boolean",
+                "read": true,
+                "write": true,
+                "def": true
+            },
+            "native": {}
+        },
+        {
+            "_id": "preset.timer",
+            "type": "state",
+            "common": {
+                "role": "level.timer",
+                "name": "Preset timer duration, 0 = no timer",
+                "type": "number",
+                "unit": "min",
+                "min": 0,
+                "max": 240,
+                "read": true,
+                "write": true,
+                "def": 0
+            },
+            "native": {}
+        },
+        {
+            "_id": "preset.toggle",
+            "type": "state",
+            "common": {
+                "role": "button",
+                "name": "Start the preset if everything is off, otherwise switch everything off",
+                "type": "boolean",
+                "read": false,
+                "write": true
+            },
+            "native": {}
         }
     ]
 }

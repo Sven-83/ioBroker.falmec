@@ -43,6 +43,7 @@ class FanTimer {
     this.deps = deps;
   }
   endTime = 0;
+  totalMinutes = 0;
   expiryHandle;
   tickHandle;
   generation = 0;
@@ -60,16 +61,18 @@ class FanTimer {
    * @param minutes Duration in minutes
    */
   start(minutes) {
-    this.resume(this.deps.now() + minutes * MINUTE_MS);
+    this.resume(this.deps.now() + minutes * MINUTE_MS, minutes);
   }
   /**
    * Continues with a stored end time. An end time in the past expires immediately.
    *
    * @param endTime End time in milliseconds
+   * @param totalMinutes Full duration in minutes; never shown as less than the remaining time
    */
-  resume(endTime) {
+  resume(endTime, totalMinutes) {
     this.clearHandles();
     this.endTime = endTime;
+    this.totalMinutes = Math.max(totalMinutes, this.remainingMinutes());
     this.publish();
     const generation = this.generation;
     this.expiryHandle = this.deps.schedule(
@@ -87,6 +90,7 @@ class FanTimer {
     }
     this.clearHandles();
     this.endTime = 0;
+    this.totalMinutes = 0;
     this.publish();
   }
   /**
@@ -138,12 +142,16 @@ class FanTimer {
       this.stop();
     }
   }
-  publish() {
+  remainingMinutes() {
     const remaining = this.endTime > 0 ? Math.max(0, this.endTime - this.deps.now()) : 0;
+    return Math.ceil(remaining / MINUTE_MS);
+  }
+  publish() {
     this.deps.publish({
       active: this.active,
       endTime: this.endTime,
-      remainingMinutes: Math.ceil(remaining / MINUTE_MS)
+      remainingMinutes: this.remainingMinutes(),
+      totalMinutes: this.totalMinutes
     });
   }
 }
