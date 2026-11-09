@@ -6,6 +6,7 @@ describe('Hood', () => {
     let clock: FakeClock;
     let sent: HoodState[];
     let committed: HoodState[];
+    let refused: HoodState[];
     let accept: boolean;
 
     function createHood(initial: HoodState = { level: 0, light: false }): Hood {
@@ -18,6 +19,10 @@ describe('Hood', () => {
                 committed.push(state);
                 return Promise.resolve();
             },
+            onRefused: state => {
+                refused.push(state);
+                return Promise.resolve();
+            },
             schedule: clock.schedule,
             cancel: clock.cancel,
             now: clock.now,
@@ -28,6 +33,7 @@ describe('Hood', () => {
         clock = new FakeClock();
         sent = [];
         committed = [];
+        refused = [];
         accept = true;
     });
 
@@ -91,12 +97,32 @@ describe('Hood', () => {
         expect(hood.target).to.deep.equal({ level: 1, light: true });
     });
 
+    it('reports the state that stays valid when the signal is refused', async () => {
+        accept = false;
+        const hood = createHood({ level: 1, light: true });
+        void hood.apply({ level: 4 });
+        await clock.advance(COALESCE_MS);
+        expect(refused).to.deep.equal([{ level: 1, light: true }]);
+    });
+
+    it('does not report a refusal for an accepted signal', async () => {
+        const hood = createHood();
+        void hood.apply({ level: 1 });
+        await clock.advance(COALESCE_MS);
+        expect(refused).to.deep.equal([]);
+    });
+
     it('treats an exception of the sender as refused', async () => {
+        const reported: HoodState[] = [];
         const hood = new Hood(
             { level: 0, light: false },
             {
                 send: () => Promise.reject(new Error('boom')),
                 onCommit: () => Promise.resolve(),
+                onRefused: state => {
+                    reported.push(state);
+                    return Promise.resolve();
+                },
                 schedule: clock.schedule,
                 cancel: clock.cancel,
                 now: clock.now,
@@ -105,6 +131,62 @@ describe('Hood', () => {
         const result = hood.apply({ level: 1 });
         await clock.advance(COALESCE_MS);
         expect(await result).to.equal(false);
+        expect(reported).to.deep.equal([{ level: 0, light: false }]);
+    });
+
+    it('still reports false and accepts new commands when reporting a refusal fails', async () => {
+        const states: HoodState[] = [];
+        const hood = new Hood(
+            { level: 0, light: false },
+            {
+                send: state => {
+                    states.push(state);
+                    return Promise.resolve(false);
+                },
+                onCommit: () => Promise.resolve(),
+                onRefused: () => Promise.reject(new Error('boom')),
+                schedule: clock.schedule,
+                cancel: clock.cancel,
+                now: clock.now,
+            },
+        );
+        const result = hood.apply({ level: 1 });
+        await clock.advance(COALESCE_MS);
+        expect(await result).to.equal(false);
+        void hood.apply({ level: 2 });
+        await clock.advance(MIN_GAP_MS);
+        expect(states).to.have.length(2);
+    });
+
+    it('does not report a refusal after dispose', async () => {
+        let release: (value: boolean) => void = () => undefined;
+        const reported: HoodState[] = [];
+        const hood = new Hood(
+            { level: 0, light: false },
+            {
+                send: () => new Promise(resolve => (release = resolve)),
+                onCommit: () => Promise.resolve(),
+                onRefused: state => {
+                    reported.push(state);
+                    return Promise.resolve();
+                },
+                schedule: clock.schedule,
+                cancel: clock.cancel,
+                now: clock.now,
+            },
+        );
+        void hood.apply({ level: 1 });
+        await clock.advance(COALESCE_MS);
+        hood.dispose();
+        release(false);
+        await settle();
+        expect(reported).to.deep.equal([]);
+    });
+
+    it('leaves waiting commands out of confirmed', () => {
+        const hood = createHood({ level: 1, light: false });
+        void hood.apply({ level: 3 });
+        expect(hood.confirmed).to.deep.equal({ level: 1, light: false });
     });
 
     it('keeps the minimum gap between two signals', async () => {
@@ -135,6 +217,7 @@ describe('Hood', () => {
                     return states.length === 1 ? new Promise(resolve => (release = resolve)) : Promise.resolve(true);
                 },
                 onCommit: () => Promise.resolve(),
+                onRefused: () => Promise.resolve(),
                 schedule: clock.schedule,
                 cancel: clock.cancel,
                 now: clock.now,

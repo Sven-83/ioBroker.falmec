@@ -15,10 +15,10 @@ const VARIABLE_BIT_POSITIONS = [6, 7, 8, 9];
  * Normalises a configured bit pattern by removing whitespace.
  *
  * @param pattern Pattern as entered in the configuration
- * @returns The pattern without whitespace
+ * @returns The pattern without whitespace; empty if it is not a string
  */
-export function normalizePattern(pattern: string): string {
-    return pattern.replace(/\s/g, '');
+export function normalizePattern(pattern: unknown): string {
+    return typeof pattern === 'string' ? pattern.replace(/\s/g, '') : '';
 }
 
 /**

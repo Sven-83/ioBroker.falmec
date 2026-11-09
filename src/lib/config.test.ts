@@ -44,6 +44,10 @@ describe('config', () => {
             expect(validateConfig({ ...validConfig, basePattern: '0101' })).to.have.length(1);
         });
 
+        it('rejects a pattern that is stored as a number instead of crashing', () => {
+            expect(validateConfig({ ...validConfig, basePattern: 101 as unknown as string })).to.have.length(1);
+        });
+
         it('rejects a pattern with other characters', () => {
             expect(validateConfig({ ...validConfig, basePattern: '0101 0100 0000 101x' })).to.have.length(1);
         });

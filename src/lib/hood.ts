@@ -15,6 +15,8 @@ export interface HoodDeps {
     send: (state: HoodState) => Promise<boolean>;
     /** Called after a signal has been accepted */
     onCommit: (state: HoodState) => Promise<void>;
+    /** Called with the state that stays valid after a signal has been refused */
+    onRefused: (state: HoodState) => Promise<void>;
     /** Runs a function after a delay */
     schedule: (callback: () => void, ms: number) => unknown;
     /** Cancels a scheduled function */
@@ -59,6 +61,15 @@ export class Hood {
      */
     public get target(): HoodState {
         return { ...this.committed, ...this.pending };
+    }
+
+    /**
+     * The state of the last accepted signal, without waiting commands.
+     *
+     * @returns A copy of the state
+     */
+    public get confirmed(): HoodState {
+        return { ...this.committed };
     }
 
     /**
@@ -117,6 +128,14 @@ export class Hood {
             }
         } catch {
             accepted = false;
+        }
+
+        if (!accepted && !this.disposed) {
+            try {
+                await this.deps.onRefused(this.confirmed);
+            } catch {
+                // The command is reported as refused anyway; the next signal publishes the state again.
+            }
         }
 
         this.lastSendAt = this.deps.now();

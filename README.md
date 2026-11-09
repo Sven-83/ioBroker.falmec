@@ -31,6 +31,10 @@ Die Haube meldet nichts zurück. Der Adapter zeigt deshalb nur den zuletzt von i
 
 Jedes Signal setzt immer Lüfter und Licht zusammen. Ein Licht-Befehl kann den Lüfter also auf den zuletzt gesendeten Stand zurücksetzen, wenn er inzwischen per Fernbedienung geändert wurde.
 
+Ungültige Werte und Befehle, die nicht gesendet werden konnten, werden verworfen: Der Datenpunkt zeigt danach wieder den zuletzt gesendeten Stand, im Log steht eine Warnung.
+
+Ein Befehl, den der Adapter nicht mehr verarbeitet (er läuft nicht oder wird gerade beendet), wird beim nächsten Start verworfen. Der Datenpunkt zeigt dann Stufe 0 bzw. Licht aus, bis zum nächsten Befehl.
+
 ### Konfiguration
 
 - **broadlink2-Instanz** und **Gerätename**: Das Gerät, das die Signale sendet (Name beginnt mit `RM:`).
@@ -60,6 +64,10 @@ This is a private project and is not affiliated with Falmec or BroadLink.
 The hood sends no feedback. The adapter therefore only shows the state it last sent. After the original remote has been used or after a power failure, the display is correct again after the next command.
 
 Every signal always sets fan and light together. A light command can therefore reset the fan to the last sent state if it was changed with the remote in the meantime.
+
+Invalid values and commands that could not be sent are discarded: The state shows the last sent value again and a warning appears in the log.
+
+A command the adapter no longer processes (it is not running or is just stopping) is discarded at the next start. The state then shows level 0 or light off until the next command.
 
 ### Configuration
 

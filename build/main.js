@@ -36,6 +36,7 @@ class Falmec extends utils.Adapter {
   reachableId = "";
   brokerAlive = false;
   deviceReachable = false;
+  timerMinutes = DEFAULT_MINUTES;
   /**
    * @param options Options passed by the adapter runtime
    */
@@ -61,6 +62,7 @@ class Falmec extends utils.Adapter {
     this.hood = new import_hood.Hood(await this.readInitialState(), {
       send: (state) => this.sendSignal(state),
       onCommit: (state) => this.onCommit(state),
+      onRefused: (state) => this.publishHoodState(state),
       schedule,
       cancel,
       now
@@ -73,6 +75,7 @@ class Falmec extends utils.Adapter {
       cancel,
       now
     });
+    await this.readTimerMinutes();
     await this.subscribeStatesAsync("light.*");
     await this.subscribeStatesAsync("fan.*");
     await this.subscribeStatesAsync("timer.*");
@@ -91,9 +94,19 @@ class Falmec extends utils.Adapter {
       level: (level == null ? void 0 : level.ack) && (0, import_signal.isValidLevel)(level.val) ? level.val : 0,
       light: (light == null ? void 0 : light.ack) && typeof light.val === "boolean" ? light.val : false
     };
-    await this.setState("fan.level", initial.level, true);
-    await this.setState("light.on", initial.light, true);
+    await this.publishHoodState(initial);
     return initial;
+  }
+  async readTimerMinutes() {
+    const minutes = await this.getStateAsync("timer.minutes");
+    if ((0, import_fan_timer.isValidMinutes)(minutes == null ? void 0 : minutes.val)) {
+      this.timerMinutes = minutes.val;
+    }
+    await this.setState("timer.minutes", this.timerMinutes, true);
+  }
+  async publishHoodState(state) {
+    await this.setState("fan.level", state.level, true);
+    await this.setState("light.on", state.light, true);
   }
   async watchConnection() {
     this.aliveId = `system.adapter.${this.config.broadlinkInstance}.alive`;
@@ -131,8 +144,7 @@ class Falmec extends utils.Adapter {
   }
   async onCommit(state) {
     var _a;
-    await this.setState("fan.level", state.level, true);
-    await this.setState("light.on", state.light, true);
+    await this.publishHoodState(state);
     if (state.level === 0) {
       (_a = this.timer) == null ? void 0 : _a.stop();
     }
@@ -185,6 +197,7 @@ class Falmec extends utils.Adapter {
       case "light.on":
         if (typeof state.val !== "boolean") {
           this.log.warn(`light.on needs true or false, got ${String(state.val)}`);
+          await this.setState(id, hood.confirmed.light, true);
           return;
         }
         await hood.apply({ light: state.val });
@@ -192,6 +205,7 @@ class Falmec extends utils.Adapter {
       case "fan.level":
         if (!(0, import_signal.isValidLevel)(state.val)) {
           this.log.warn(`fan.level needs an integer from 0 to ${import_signal.MAX_LEVEL}, got ${String(state.val)}`);
+          await this.setState(id, hood.confirmed.level, true);
           return;
         }
         await hood.apply({ level: state.val });
@@ -210,8 +224,10 @@ class Falmec extends utils.Adapter {
           this.log.warn(
             `timer.minutes needs an integer from ${import_fan_timer.MIN_MINUTES} to ${import_fan_timer.MAX_MINUTES}, got ${String(state.val)}`
           );
+          await this.setState(id, this.timerMinutes, true);
           return;
         }
+        this.timerMinutes = state.val;
         await this.setState(id, state.val, true);
         return;
       case "timer.start":
@@ -247,8 +263,7 @@ class Falmec extends utils.Adapter {
       this.log.warn("Timer not started: the fan is off");
       return;
     }
-    const minutes = await this.getStateAsync("timer.minutes");
-    this.timer.start((0, import_fan_timer.isValidMinutes)(minutes == null ? void 0 : minutes.val) ? minutes.val : DEFAULT_MINUTES);
+    this.timer.start(this.timerMinutes);
     await this.setState(id, true, true);
   }
   onUnload(callback) {

@@ -50,6 +50,14 @@ class Hood {
     return { ...this.committed, ...this.pending };
   }
   /**
+   * The state of the last accepted signal, without waiting commands.
+   *
+   * @returns A copy of the state
+   */
+  get confirmed() {
+    return { ...this.committed };
+  }
+  /**
    * Requests a change.
    *
    * @param change Values to change
@@ -101,6 +109,12 @@ class Hood {
       }
     } catch {
       accepted = false;
+    }
+    if (!accepted && !this.disposed) {
+      try {
+        await this.deps.onRefused(this.confirmed);
+      } catch {
+      }
     }
     this.lastSendAt = this.deps.now();
     this.sending = false;

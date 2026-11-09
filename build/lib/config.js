@@ -24,7 +24,7 @@ __export(config_exports, {
 module.exports = __toCommonJS(config_exports);
 const VARIABLE_BIT_POSITIONS = [6, 7, 8, 9];
 function normalizePattern(pattern) {
-  return pattern.replace(/\s/g, "");
+  return typeof pattern === "string" ? pattern.replace(/\s/g, "") : "";
 }
 function validateConfig(config) {
   const problems = [];
